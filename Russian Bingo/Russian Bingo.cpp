@@ -54,10 +54,6 @@ int main()
         PrintScreen.printScreen();
         cin >> selection;
 
-        player1.buildBoards();
-        player2.buildBoards();
-        player3.buildBoards();
-
         while (player1.boardCount < 1 || player1.boardCount > 4) {
             cout << "How many decks do you want (1-4) at $200 each: ";
             cin >> player1.boardCount;
