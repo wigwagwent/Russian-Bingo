@@ -63,6 +63,11 @@ int main()
             }
         }
 
+        if (selection == 4) {
+            PrintScreen.setScreen(14, "Current Amount: $" + to_string(money));
+            PrintScreen.setScreen(15, "Rounds Won: " + to_string(wonRounds));
+            PrintScreen.setScreen(16, "Rounds Lost: " + to_string(lostRounds));
+        }
         userStats.open("userData.txt");
         userStats << to_string(money) + "\n" + to_string(wonRounds) + "\n" + to_string(lostRounds) + "\n";
         userStats.close();
