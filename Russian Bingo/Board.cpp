@@ -356,13 +356,21 @@ int Board::checkWin(int _selection) {
     int board4Line3Count = 0;
     for (int i = 0; i < 9; i++)
     {
-        for (int j = 0; j < 3; j++)
-        {
-            if (board1Letter[j][i] != " 0" && board1Letter[j][i] != "xx") board1Line1Count++;
-            if (board2Letter[j][i] != " 0" && board2Letter[j][i] != "xx") board1Line2Count++;
-            if (board3Letter[j][i] != " 0" && board3Letter[j][i] != "xx") board1Line3Count++;
-            if (board4Letter[j][i] != " 0" && board4Letter[j][i] != "xx") board2Line1Count++;
-        }
+        if (board1Letter[0][i] != " 0" && board1Letter[0][i] != "xx") board1Line1Count++;
+        if (board1Letter[1][i] != " 0" && board1Letter[1][i] != "xx") board1Line2Count++;
+        if (board1Letter[2][i] != " 0" && board1Letter[2][i] != "xx") board1Line3Count++;
+
+        if (board2Letter[0][i] != " 0" && board2Letter[0][i] != "xx") board2Line1Count++;
+        if (board2Letter[1][i] != " 0" && board2Letter[1][i] != "xx") board2Line2Count++;
+        if (board2Letter[2][i] != " 0" && board2Letter[2][i] != "xx") board2Line3Count++;
+
+        if (board3Letter[0][i] != " 0" && board3Letter[0][i] != "xx") board3Line1Count++;
+        if (board3Letter[1][i] != " 0" && board3Letter[1][i] != "xx") board3Line2Count++;
+        if (board3Letter[2][i] != " 0" && board3Letter[2][i] != "xx") board3Line3Count++;
+
+        if (board4Letter[0][i] != " 0" && board4Letter[0][i] != "xx") board4Line1Count++;
+        if (board4Letter[1][i] != " 0" && board4Letter[1][i] != "xx") board4Line2Count++;
+        if (board4Letter[2][i] != " 0" && board4Letter[2][i] != "xx") board4Line3Count++;
     }
 
     if (_selection == 1) {
