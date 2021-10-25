@@ -92,9 +92,9 @@ int** Board::calculateBoard() {
     return line;
 }
 void Board::buildBoards() {
-    bool matchingNumber = true;
-    while (matchingNumber == true) {
-        matchingNumber = false;
+    bool matchingNumber = false;
+     do {
+         matchingNumber = false;
         for (int i = 0; i < 9; i++)
         {
             if (((board1Number[0][i] == board1Number[1][i]) || (board1Number[0][i] == board1Number[2][i])) && (board1Number[0][i] != 0)) {
@@ -107,10 +107,9 @@ void Board::buildBoards() {
         if (matchingNumber == true) {
             board1Number = calculateBoard();
         }
-    }
+     } while (matchingNumber == true);
 
-    matchingNumber = true;
-    while (matchingNumber == true) {
+    do {
         matchingNumber = false;
         for (int i = 0; i < 9; i++)
         {
@@ -124,10 +123,9 @@ void Board::buildBoards() {
         if (matchingNumber == true) {
             board2Number = calculateBoard();
         }
-    }
+    } while (matchingNumber == true);
 
-    matchingNumber = true;
-    while (matchingNumber == true) {
+    do {
         matchingNumber = false;
         for (int i = 0; i < 9; i++)
         {
@@ -141,10 +139,9 @@ void Board::buildBoards() {
         if (matchingNumber == true) {
             board3Number = calculateBoard();
         }
-    }
+    } while (matchingNumber == true);
 
-    matchingNumber = true;
-    while (matchingNumber == true) {
+    do {
         matchingNumber = false;
         for (int i = 0; i < 9; i++)
         {
@@ -158,7 +155,8 @@ void Board::buildBoards() {
         if (matchingNumber == true) {
             board4Number = calculateBoard();
         }
-    }
+    } while (matchingNumber == true);
+
     for (int i = 0; i < 9; i++)
     {
         for (int j = 0; j < 3; j++)
@@ -175,10 +173,9 @@ void Board::buildBoards() {
             if (board4Number[j][i] < 10) board4Letter[j][i] = " " + to_string(board4Number[j][i]);
             else board4Letter[j][i] = to_string(board4Number[j][i]);
         }
-        
-
     }
 }
+
 void Board::printBoards(string _boxNumber, int _bank, int _money) {
     string display[22];
     PrintScreen game;
