@@ -6,22 +6,19 @@
 #include "PrintScreen.h"
 using namespace std;
 
+bool playGame(int selection, int &money);
+
 
 int main()
 {
     PrintScreen PrintScreen;
-    Board player1;
-    Board player2;
-    Board player3;
 
-    bool usedNumbers[90];
     int selection;
 
-    int bank = 0;
     int money;
     int wonRounds;
     int lostRounds;
-    int bet = 0;
+    
 
     srand(time(0));
     fstream userStats;
@@ -54,24 +51,123 @@ int main()
         PrintScreen.printScreen();
         cin >> selection;
 
-        while (player1.boardCount < 1 || player1.boardCount > 4) {
-            cout << "How many decks do you want (1-4) at $200 each: ";
-            cin >> player1.boardCount;
+        if (selection == 1 || selection == 2 || selection == 3)
+        {
+            bool results;
+            results = playGame(selection, money);
+            if (results) {
+                wonRounds++;
+            }
+            else {
+                lostRounds++;
+            }
         }
+
+        userStats.open("userData.txt");
+        userStats << to_string(money) + "\n" + to_string(wonRounds) + "\n" + to_string(lostRounds) + "\n";
+        userStats.close();
+    } while (selection != 5);
+}
+
+bool playGame(int selection, int &money)
+{
+    bool usedNumbers[90];
+    int bet = 0;
+    int bank = 0;
+
+    Board player1;
+    Board player2;
+    Board player3;
+
+    while (player1.boardCount < 1 || player1.boardCount > 4) {
+        cout << "How many decks do you want (1-4) at $200 each: ";
+        cin >> player1.boardCount;
+    }
+    do {
+        cout << "How much do you want to bet, min is 10, max is your money: ";
+        cin >> bet;
+    } while (bet < 10 && bet >= money);
+    bank = bet * 3 + player1.boardCount * 200 + player2.boardCount * 200 + player3.boardCount * 200;
+    money -= (player1.boardCount * 200 + bet);
+
+    player2.boardCount = rand() % player1.boardCount + 1;
+    if (player2.boardCount > 4) player2.boardCount = 4;
+    player3.boardCount = rand() % player1.boardCount + 1;
+    if (player3.boardCount > 4) player3.boardCount = 4;
+
+    int viewPlayers;
+    do {
+        cout << "Do you want to view the other players cards, type player number(1,2,3): ";
+        cin >> viewPlayers;
+        if (viewPlayers == 2) {
+            player2.printBoards(" 2", bank, money);
+        }
+        if (viewPlayers == 3) {
+            player3.printBoards(" 3", bank, money);
+        }
+    } while (viewPlayers == 2 || viewPlayers == 3);
+
+    for (int i = 0; i < 90; i++)
+    {
+        usedNumbers[i] = false;
+    }
+
+    while (player1.checkWin(selection) != 3 && player2.checkWin(selection) != 3 || player3.checkWin(selection) != 3) {
+        int randomNumber = rand() % 89 + 1;
+        while (usedNumbers[randomNumber]) {
+            randomNumber = rand() % 89 + 1;
+        }
+        usedNumbers[randomNumber] = true;
+        string randomNumberLetter;
+
+        if (randomNumber < 10) randomNumberLetter = " " + to_string(randomNumber);
+        else randomNumberLetter = to_string(randomNumber);
+
+        int count;
+        player1.printBoards(randomNumberLetter, bank, money);
+        cout << "Enter how many times you see the number: ";
+        cin >> count;
+        if (count <= player1.boardCount && count > 0) {
+            for (int i = 0; i < count; i++)
+            {
+                int deck;
+                if (player1.boardCount == 1) {
+                    deck = 1;
+                }
+                else {
+                    cout << "What deck did you see it in: ";
+                    cin >> deck;
+                }
+                if (!player1.checkBoards(randomNumber, deck)) {
+                    count = 0;
+                }
+                player1.printBoards(randomNumberLetter, bank, money);
+            }
+
+        }
+        for (int i = 1; i <= 4; i++)
+        {
+            if (rand() % 100 != 1) player2.checkBoards(randomNumber, i);
+            if (rand() % 100 != 1) player3.checkBoards(randomNumber, i);
+        }
+
+        if (player1.checkWin(selection) == 1) {
+            bank += (bet * 2);
+        }
+        else if (player2.checkWin(selection) == 1 || player3.checkWin(selection) == 1) {
+            bank += (bet * 2);
+            money -= bet;
+        }
+        if (player1.checkWin(selection) == 2) {
+            bank /= 2;
+            money += bank;
+        }
+        else if (player2.checkWin(selection) == 2 || player3.checkWin(selection) == 2) {
+            bank /= 2;
+        }
+        player1.printBoards(randomNumberLetter, bank, money);
+
         do {
-            cout << "How much do you want to bet, min is 10, max is your money: ";
-            cin >> bet;
-        } while (bet < 10 && bet >= money);
-        bank = bet * 3 + player1.boardCount * 200 + player2.boardCount * 200 + player3.boardCount * 200;
-        money -= (player1.boardCount * 200 + bet);
-
-        player2.boardCount = rand() % player1.boardCount + 1;
-        if (player2.boardCount > 4) player2.boardCount = 4;
-        player3.boardCount = rand() % player1.boardCount + 1;
-        if (player3.boardCount > 4) player3.boardCount = 4;
-
-        int viewPlayers;
-        do {  
             cout << "Do you want to view the other players cards, type player number(1,2,3): ";
             cin >> viewPlayers;
             if (viewPlayers == 2) {
@@ -82,113 +178,33 @@ int main()
             }
         } while (viewPlayers == 2 || viewPlayers == 3);
 
-        for (int i = 0; i < 90; i++)
-        {
-            usedNumbers[i] = false;
-        }
+    }
+    if (money < 0) {
+        money *= 1.08;
+        cout << "8% interest because you are negative" << endl;
+    }
 
-        while (player1.checkWin(selection) != 3 && player2.checkWin(selection) != 3 || player3.checkWin(selection) != 3) {
-            int randomNumber = rand() % 89 + 1;
-            while (usedNumbers[randomNumber]) {
-                randomNumber = rand() % 89 + 1;
-            }
-            usedNumbers[randomNumber] = true;
-            string randomNumberLetter;
-            
-            if (randomNumber < 10) randomNumberLetter = " " + to_string(randomNumber);
-            else randomNumberLetter = to_string(randomNumber);
-            
-            int count;
-            player1.printBoards(randomNumberLetter, bank, money);
-            cout << "Enter how many times you see the number: ";
-            cin >> count;
-            if (count <= player1.boardCount && count > 0) {
-                for (int i = 0; i < count; i++)
-                {
-                    int deck;
-                    if (player1.boardCount == 1) {
-                        deck = 1;
-                    }
-                    else {
-                        cout << "What deck did you see it in: ";
-                        cin >> deck;
-                    }
-                    if (!player1.checkBoards(randomNumber, deck)) {
-                        count = 0;
-                    }
-                    player1.printBoards(randomNumberLetter, bank, money);
-                }
-                
-            }
-            for (int i = 1; i <= 4; i++)
-            {
-                if (rand() % 100 != 1) player2.checkBoards(randomNumber, i);
-                if (rand() % 100 != 1) player3.checkBoards(randomNumber, i);
-            }
+    int playerWonCount = 0;
+    if (player2.checkWin(selection) == 3) {
+        player2.printBoards(" 2", bank, money);
+        cout << "Player 2 won" << endl;
+        playerWonCount++;
+    }
+    if (player3.checkWin(selection) == 3) {
+        player3.printBoards(" 3", bank, money);
+        cout << "Player 3 won" << endl;
+        playerWonCount++;
+    }
 
-            if (player1.checkWin(selection) == 1) {
-                bank += (bet * 2);
-            }
-            else if (player2.checkWin(selection) == 1 || player3.checkWin(selection) == 1) {
-                bank += (bet * 2);
-                money -= bet;
-            }
-            if (player1.checkWin(selection) == 2) {
-                bank /= 2;
-                money += bank;
-            }
-            else if (player2.checkWin(selection) == 2 || player3.checkWin(selection) == 2) {
-                bank /= 2;
-            }
-            player1.printBoards(randomNumberLetter, bank, money);
-
-            do {
-                cout << "Do you want to view the other players cards, type player number(1,2,3): ";
-                cin >> viewPlayers;
-                if (viewPlayers == 2) {
-                    player2.printBoards(" 2", bank, money);
-                }
-                if (viewPlayers == 3) {
-                    player3.printBoards(" 3", bank, money);
-                }
-            } while (viewPlayers == 2 || viewPlayers == 3);
-
-        }
-        int playerWonCount = 0;
-
-        if (player1.checkWin(selection) == 3) {
-            player1.printBoards(" 1", bank, money);
-            cout << "You won" << endl;
-            playerWonCount++;
-            wonRounds++;
-        }
-        else {
-            lostRounds++;
-        }
-        if (player2.checkWin(selection) == 3) {
-            player2.printBoards(" 2", bank, money);
-            cout << "Player 2 won" << endl;
-            playerWonCount++;
-        }
-        if (player3.checkWin(selection) == 3) {
-            player3.printBoards(" 3", bank, money);
-            cout << "Player 3 won" << endl;
-            playerWonCount++;
-        }
-        if (money < 0) {
-            money *= 1.08;
-            cout << "8% interest because you are negative" << endl;
-        }
-
+    if (player1.checkWin(selection) == 3) {
+        player1.printBoards(" 1", bank, money);
+        cout << "You won" << endl;
+        playerWonCount++;
         money += bank / playerWonCount;
-        player1.reset();
-        player2.reset();
-        player3.reset();
-
-        bank = 0;
-
-        userStats.open("userData.txt");
-        userStats << to_string(money) + "\n" + to_string(wonRounds) + "\n" + to_string(lostRounds) + "\n";
-        userStats.close();
-    } while (selection != 5);
+        return true;
+    }
+    else {
+        money += bank / playerWonCount;
+        return false;
+    }
 }
