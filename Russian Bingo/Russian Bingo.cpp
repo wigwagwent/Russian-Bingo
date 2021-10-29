@@ -11,18 +11,18 @@ bool playGame(int selection, int &money);
 
 int main()
 {
-    PrintScreen PrintScreen;
+    
 
     int selection;
-
     int money;
     int wonRounds;
     int lostRounds;
-    
+    string readLine;
 
     srand(time(0));
+    PrintScreen PrintScreen;
     fstream userStats;
-    string readLine;
+    
 
     userStats.open("userData.txt");
     getline(userStats, readLine);
@@ -100,6 +100,7 @@ bool playGame(int selection, int &money)
     player3.boardCount = rand() % player1.boardCount + 1;
     if (player3.boardCount > 4) player3.boardCount = 4;
 
+    // View other players board
     int viewPlayers;
     do {
         cout << "Do you want to view the other players cards, type player number(1,2,3): ";
@@ -116,7 +117,7 @@ bool playGame(int selection, int &money)
     {
         usedNumbers[i] = false;
     }
-
+    // Main game loop code
     while (player1.checkWin(selection) != 3 && player2.checkWin(selection) != 3 || player3.checkWin(selection) != 3) {
         int randomNumber = rand() % 89 + 1;
         while (usedNumbers[randomNumber]) {
@@ -184,6 +185,8 @@ bool playGame(int selection, int &money)
         } while (viewPlayers == 2 || viewPlayers == 3);
 
     }
+
+    //calculate money and win coutn after someone wins
     if (money < 0) {
         money *= 1.08;
         cout << "8% interest because you are negative" << endl;
