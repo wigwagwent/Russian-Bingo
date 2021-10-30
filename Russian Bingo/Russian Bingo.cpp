@@ -77,6 +77,8 @@ int main()
 bool playGame(int selection, int &money)
 {
     bool usedNumbers[90];
+    int player2Updated = 100;
+    int player3Updated = 100; // initial value above 10 so that it doesn't display anything marked off 
     int bet = 0;
     int bank = 0;
 
@@ -102,23 +104,37 @@ bool playGame(int selection, int &money)
 
     // View other players board
     int viewPlayers;
-    do {
-        cout << "Do you want to view the other players cards, type player number(1,2,3): ";
-        cin >> viewPlayers;
-        if (viewPlayers == 2) {
-            player2.printBoards(" 2", bank, money);
-        }
-        if (viewPlayers == 3) {
-            player3.printBoards(" 3", bank, money);
-        }
-    } while (viewPlayers == 2 || viewPlayers == 3);
+    
 
     for (int i = 0; i < 90; i++)
     {
         usedNumbers[i] = false;
     }
+
+
+
     // Main game loop code
     while (player1.checkWin(selection) != 3 && player2.checkWin(selection) != 3 || player3.checkWin(selection) != 3) {
+        if (player2Updated > 0 || player3Updated > 0) {
+            do {
+                if (player2Updated > 0 && player2Updated < 10) {
+                    cout << "Player 2 crossed " << player2Updated << " off" << endl;
+                }
+                if (player3Updated > 0 && player3Updated < 10) {
+                    cout << "Player 3 crossed " << player3Updated << " off" << endl;
+                }
+                cout << "Do you want to view the other players cards, type player number(1,2,3): ";
+                cin >> viewPlayers;
+                if (viewPlayers == 2) {
+                    player2.printBoards(" 2", bank, money);
+                }
+                if (viewPlayers == 3) {
+                    player3.printBoards(" 3", bank, money);
+                }
+            } while (viewPlayers == 2 || viewPlayers == 3);
+        }
+
+
         int randomNumber = rand() % 89 + 1;
         while (usedNumbers[randomNumber]) {
             randomNumber = rand() % 89 + 1;
@@ -151,10 +167,16 @@ bool playGame(int selection, int &money)
             }
 
         }
+        player2Updated = 0;
+        player3Updated = 0;
         for (int i = 1; i <= 4; i++)
         {
-            if (rand() % 100 != 1) player2.checkBoards(randomNumber, i);
-            if (rand() % 100 != 1) player3.checkBoards(randomNumber, i);
+            if (rand() % 100 != 1) { 
+                if (i <= player2.boardCount) player2Updated += player2.checkBoards(randomNumber, i);
+            }
+            if (rand() % 100 != 1) {
+                if (i <= player3.boardCount) player3Updated += player3.checkBoards(randomNumber, i);
+            }
         }
 
         if (player1.checkWin(selection) == 1) {
@@ -172,18 +194,6 @@ bool playGame(int selection, int &money)
             bank /= 2;
         }
         player1.printBoards(randomNumberLetter, bank, money);
-
-        do {
-            cout << "Do you want to view the other players cards, type player number(1,2,3): ";
-            cin >> viewPlayers;
-            if (viewPlayers == 2) {
-                player2.printBoards(" 2", bank, money);
-            }
-            if (viewPlayers == 3) {
-                player3.printBoards(" 3", bank, money);
-            }
-        } while (viewPlayers == 2 || viewPlayers == 3);
-
     }
 
     //calculate money and win coutn after someone wins
